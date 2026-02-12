@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Manager - Simple GUI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+        }
+
+        h2 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button.delete {
+            background: #dc3545;
+        }
+
+        button.delete:hover {
+            background: #c82333;
+        }
+
+        button.secondary {
+            background: #6c757d;
+        }
+
+        button.secondary:hover {
+            background: #5a6268;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 7px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .badge-active {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-inactive {
+            background: #6c757d;
+            color: white;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+            }
+        }
+
+        .search-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏠 Address Management System</h1>
+
+        <!-- Status Messages -->
+        <div id="successAlert" class="alert alert-success" style="display: none;"></div>
+        <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
+        <div id="loading" class="loading" style="display: none;">Loading...</div>
+
+        <!-- Search Section -->
+        <div class="card">
+            <h2>🔍 Search Addresses</h2>
+            <div class="search-fields">
+                <div class="form-group">
+                    <label>Street Name</label>
+                    <input type="text" id="searchStreet" placeholder="e.g., Main St">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="searchStatus">
+                        <option value="">Any</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="INACTIVE">INACTIVE</option>
+                        <option value="PENDING">PENDING</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Source</label>
+                    <input type="text" id="searchSource" placeholder="Source">
+                </div>
+                <div class="form-group">
+                    <label>House Number</label>
+                    <input type="number" id="searchHouseNumber" placeholder="Exact number">
+                </div>
+                <div class="form-group">
+                    <label>House Letter</label>
+                    <input type="text" id="searchHouseLetter" placeholder="e.g., A, B">
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <button onclick="searchAddresses()">🔎 Search</button>
+                <button class="secondary" onclick="clearSearch()">🗑️ Clear</button>
+                <button class="secondary" onclick="loadAllAddresses()" style="float: right;">📋 Show All</button>
+            </div>
+        </div>
+
+        <!-- Add/Edit Form -->
+        <div class="card">
+            <h2 id="formTitle">➕ Add New Address</h2>
+            <input type="hidden" id="addressId">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select id="status" required>
+                            <option value="">Select status</option>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                            <option value="PENDING">PENDING</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Source *</label>
+                        <input type="text" id="source" placeholder="e.g., SYSTEM, USER" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Street Name *</label>
+                        <input type="text" id="streetName" placeholder="Street name" required>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>House Number *</label>
+                        <input type="number" id="houseNumber" placeholder="123" required>
+                    </div>
+                    <div class="form-group">
+                        <label>House Letter</label>
+                        <input type="text" id="houseLetter" placeholder="A, B, etc.">
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <button onclick="saveAddress()" id="saveBtn">💾 Save Address</button>
+                <button class="secondary" onclick="resetForm()" id="cancelBtn" style="display: none;">✖️ Cancel</button>
+            </div>
+        </div>
+
+        <!-- Addresses List -->
+        <div class="card">
+            <h2>📋 Address List</h2>
+            <div id="addressCount" style="margin-bottom: 10px; color: #666;"></div>
+            <div id="addressTable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Status</th>
+                            <th>Source</th>
+                            <th>Street</th>
+                            <th>#</th>
+                            <th>Letter</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="addressTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px; color: #666;">
+                                No addresses found. Create one!
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:8080';
+
+        // Helper function for API calls
+        async function apiCall(url, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(API_BASE_URL + url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            if (response.status !== 204) { // No content
+                return await response.json();
+            }
+            return null;
+        }
+
+        // Show/hide loading and alerts
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const alert = document.getElementById('successAlert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 3000);
+        }
+
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 5000);
+        }
+
+        // Load all addresses
+        async function loadAllAddresses() {
+            showLoading();
+            try {
+                const addresses = await apiCall('/addresses/v1');
+                displayAddresses(addresses);
+                showSuccess('Addresses loaded successfully!');
+            } catch (error) {
+                showError('Failed to load addresses. Is the backend running?');
+                console.error('Error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Display addresses in table
+        function displayAddresses(addresses) {
+            const tbody = document.getElementById('addressTableBody');
+            const countDiv = document.getElementById('addressCount');
+
+            countDiv.textContent = `Total: ${addresses.length} address(es)`;
+
+            if (addresses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">No addresses found</td></tr>';
+                return;
+            }
+
+            let html = '';
+            addresses.forEach(addr => {
+                const statusClass = addr.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive';
+
+                html += `<tr>
+                    <td>${addr.id}</td>
+                    <td><span class="badge ${statusClass}">${addr.status}</span></td>
+                    <td>${addr.source}</td>
+                    <td>${addr.streetName}</td>
+                    <td>${addr.houseNumber}</td>
+                    <td>${addr.houseLetter || '-'}</td>
+                    <td class="action-buttons">
+                        <button onclick="editAddress(${addr.id})" style="background: #28a745;">✏️ Edit</button>
+                        <button class="delete" onclick="deleteAddress(${addr.id})">🗑️ Delete</button>
+                    </td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Search addresses
+        async function searchAddresses() {
+            const criteria = {};
+
+            const street = document.getElementById('searchStreet').value;
+            const status = document.getElementById('searchStatus').value;
+            const source = document.getElementById('searchSource').value;
+            const houseNumber = document.getElementById('searchHouseNumber').value;
+            const houseLetter = document.getElementById('searchHouseLetter').value;
+
+            if (street) criteria.streetName = street;
+            if (status) criteria.status = status;
+            if (source) criteria.source = source;
+            if (houseNumber) criteria.houseNumber = parseInt(houseNumber);
+            if (houseLetter) criteria.houseLetter = houseLetter;
+
+            if (Object.keys(criteria).length === 0) {
+                showError('Please enter at least one search criteria');
+                return;
+            }
+
+            showLoading();
+            try {
+                const addresses = await apiCall('/addresses/v1/search', 'POST', criteria);
+                displayAddresses(addresses);
+                showSuccess(`Found ${addresses.length} address(es)`);
+            } catch (error) {
+                showError('Search failed. Please try again.');
+                console.error('Search error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Clear search fields
+        function clearSearch() {
+            document.getElementById('searchStreet').value = '';
+            document.getElementById('searchStatus').value = '';
+            document.getElementById('searchSource').value = '';
+            document.getElementById('searchHouseNumber').value = '';
+            document.getElementById('searchHouseLetter').value = '';
+            loadAllAddresses();
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('addressId').value = '';
+            document.getElementById('status').value = '';
+            document.getElementById('source').value = '';
+            document.getElementById('streetName').value = '';
+            document.getElementById('houseNumber').value = '';
+            document.getElementById('houseLetter').value = '';
+            document.getElementById('formTitle').innerHTML = '➕ Add New Address';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('saveBtn').innerHTML = '💾 Save Address';
+        }
+
+        // Save address (create or update)
+        async function saveAddress() {
+            // Validate required fields
+            const status = document.getElementById('status').value;
+            const source = document.getElementById('source').value;
+            const streetName = document.getElementById('streetName').value;
+            const houseNumber = document.getElementById('houseNumber').value;
+
+            if (!status || !source || !streetName || !houseNumber) {
+                showError('Please fill all required fields');
+                return;
+            }
+
+            const addressData = {
+                status: status,
+                source: source,
+                streetName: streetName,
+                houseNumber: parseInt(houseNumber),
+                houseLetter: document.getElementById('houseLetter').value || ''
+            };
+
+            const id = document.getElementById('addressId').value;
+
+            showLoading();
+            try {
+                if (id) {
+                    await apiCall(`/addresses/v1/${id}`, 'PUT', addressData);
+                    showSuccess('Address updated successfully!');
+                } else {
+                    await apiCall('/addresses/v1', 'POST', addressData);
+                    showSuccess('Address created successfully!');
+                }
+                resetForm();
+                await loadAllAddresses();
+            } catch (error) {
+                showError('Failed to save address. Please try again.');
+                console.error('Save error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Edit address
+        async function editAddress(id) {
+            showLoading();
+            try {
+                const address = await apiCall(`/addresses/v1/${id}`);
+
+                document.getElementById('addressId').value = address.id;
+                document.getElementById('status').value = address.status;
+                document.getElementById('source').value = address.source;
+                document.getElementById('streetName').value = address.streetName;
+                document.getElementById('houseNumber').value = address.houseNumber;
+                document.getElementById('houseLetter').value = address.houseLetter || '';
+
+                document.getElementById('formTitle').innerHTML = '✏️ Edit Address';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+                document.getElementById('saveBtn').innerHTML = '🔄 Update Address';
+
+                window.scrollTo(0, 0);
+            } catch (error) {
+                showError('Failed to load address details');
+                console.error('Edit error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Delete address
+        async function deleteAddress(id) {
+            if (!confirm('Are you sure you want to delete this address?')) {
+                return;
+            }
+
+            showLoading();
+            try {
+                await apiCall(`/addresses/v1/${id}`, 'DELETE');
+                showSuccess('Address deleted successfully!');
+                await loadAllAddresses();
+            } catch (error) {
+                showError('Failed to delete address');
+                console.error('Delete error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', loadAllAddresses);
+    </script>
+</body>
+
+</html>
