@@ -1,0 +1,57 @@
+### Gradle ###
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+bin/
+
+### Java ###
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.db
+*.lock
+hs_err_pid*
+target/
+dependency-reduced-pom.xml
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+
+### Eclipse ###
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+### VS Code ###
+.vscode/
+.factorypath
+dependency-reduced-pom.xml
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Application ###
+application-local.properties
+application-dev.properties
+*.db
