@@ -31,6 +31,7 @@ src/main/java/com/example/address/
 └── config/ # Configuration classes (CORS, etc.)
 
 🧪 Testing with Simple GUI
+
 A single-file HTML GUI is included for testing:
 
 Start the Spring Boot application
