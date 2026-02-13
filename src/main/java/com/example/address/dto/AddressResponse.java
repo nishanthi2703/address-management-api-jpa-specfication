@@ -5,14 +5,14 @@ import java.time.format.DateTimeFormatter;
 import com.example.address.model.Address;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class AddressResponse {
 
 	private Long id;
