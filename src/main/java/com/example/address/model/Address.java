@@ -33,7 +33,7 @@ public class Address {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private AddressStatus status;
-	
+
 	private String source;
 
 	@NotBlank(message = "Street name is required")
@@ -48,11 +48,11 @@ public class Address {
 	
 	@CreatedDate
     @Column(name = "created_date", nullable = false, updatable = false)
-	private LocalDateTime createdate;
+	private LocalDateTime createdDate;
 	
 	@LastModifiedDate
     @Column(name = "last_modified_date")
-    private LocalDateTime updatedAt;
+    private LocalDateTime lastModifiedDate;
 
 
 }

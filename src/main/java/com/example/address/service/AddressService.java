@@ -38,6 +38,11 @@ public class AddressService {
         return new AddressResponse(addressRepository.save(address));
     }
 
+    @Transactional(readOnly = true)
+    public AddressResponse getAddressById(Long id) {
+        return new AddressResponse(getAddress(id));
+    }
+
     private Address getAddress(Long id){
         return addressRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + id));
@@ -49,11 +54,6 @@ public class AddressService {
                 .stream()
                 .map(AddressResponse::new)
                 .collect(Collectors.toList());
-	}
-
-	@Transactional(readOnly = true)
-	public AddressResponse getAddressById(Long id) {
-        return new AddressResponse(getAddress(id));
 	}
 
 	@Transactional
