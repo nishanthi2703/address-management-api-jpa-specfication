@@ -38,16 +38,16 @@ public class AddressResponse {
 		this.streetName = address.getStreetName();
 		this.houseNumber = address.getHouseNumber();
 		this.houseLetter = address.getHouseLetter();
-		this.createdAt = address.getCreatedate();
-		this.updatedAt = address.getUpdatedAt();
+		this.createdAt = address.getCreatedDate();
+		this.updatedAt = address.getLastModifiedDate();
 
 		// Format dates for human-readable format
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		if (address.getCreatedate() != null) {
-			this.formattedCreatedAt = address.getCreatedate().format(formatter);
+		if (address.getCreatedDate() != null) {
+			this.formattedCreatedAt = address.getCreatedDate().format(formatter);
 		}
-		if (address.getUpdatedAt() != null) {
-			this.formattedUpdatedAt = address.getUpdatedAt().format(formatter);
+		if (address.getLastModifiedDate() != null) {
+			this.formattedUpdatedAt = address.getLastModifiedDate().format(formatter);
 		}
 	}
 }
